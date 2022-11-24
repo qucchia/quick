@@ -24,17 +24,15 @@ function sonoritza(so: string) {
   return item ? item[0] : so;
 }
 
-const APROXIMANTS_NO_GRADUALS = {
-  b: "β",
-  d: "ð",
-  g: "ɣ",
-};
+const APROXIMANTS_NO_GRADUALS = [
+  ["b", "β"],
+  ["d", "ð"],
+  ["g", "ɣ"],
+];
 
 function aproxima(so: string) {
-  if (so in APROXIMANTS_NO_GRADUALS) {
-    return APROXIMANTS_NO_GRADUALS[so];
-  }
-  return so;
+  const item = APROXIMANTS_NO_GRADUALS.find((item) => item[1] === so);
+  return item ? item[0] : so;
 }
 
 function ésVocal(lletra?: string) {
@@ -45,7 +43,23 @@ type Propietats = {
   entreVocals: boolean;
 };
 
-function transcriuLletra(
+const TRANSCRIPCIONS_INICIALS = {
+  a: "a",
+  b: "v",
+  c: (posterior: string) => ("ei".includes(posterior) ? "s" : "k"),
+  ç: "s",
+  e: "e",
+  f: "f",
+  g: (posterior: string) => ("ei".includes(posterior) ? "ʒ" : "g"),
+  h: "",
+  i: "i",
+  j: "ʒ",
+  k: "k",
+  l: "l",
+  v: "v",
+} as const;
+
+function transcriuLletraInicial(
   lletra: string,
   propietats: Propietats,
   anterior?: string,
@@ -62,16 +76,38 @@ function transcriuLletra(
     case "k":
       return "k";
     case "s":
-      if (anterior === "s") return "";
-      if (posterior === "s") return "s";
-      return propietats.entreVocals ? "z" : "s";
+      return "s";
     default:
       return "?";
   }
 }
 
+function fenòmensDeContacte(so: string) {}
+
+function transcriuLletra(
+  lletra: string,
+  propietats: Propietats,
+  anterior?: string,
+  posterior?: string
+) {
+  const soInicial = transcriuLletraInicial(
+    lletra,
+    propietats,
+    anterior,
+    posterior
+  );
+  return soInicial;
+}
+
 export default function transcriu(text: string) {
   const lletres = text.split("");
+  const transcripcióInicial = lletres.map((lletra, i) => {
+    const anterior = lletres[i - 1];
+    const posterior = lletres[i + 1];
+    return transcriuLletraInicial(lletra, {
+      entreVocals: ésVocal(anterior) && ésVocal(posterior),
+    });
+  });
   return (
     "[" +
     lletres

@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "description": "Transcriptor fonètic català.",
   "scripts": {
-    "test": "tsc && node build/test.js"
+    "test": "tsc && node --experimental-specifier-resolution=node build/test.js"
   },
   "author": "qucchia",
   "license": "GPL-3.0-or-later"
